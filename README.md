@@ -1,198 +1,391 @@
-> **The smart way to write your commit messages using AI** 🤖
+# GSmart - Git Smart CLI
 
-GSmart is a CLI tool that automatically generates [Conventional Commits](https://www.conventionalcommits.org/) by analyzing your staged git changes. Simply stage your files and let AI craft the perfect commit message for you.
+```
+ _____  _____                          _
+|  __ \/  ___|                        | |
+| |  \/\ `--.  _ __ ___    __ _  _ __ | |_
+| | __  `--. \| '_ ` _ \  / _` || '__|| __|
+| |_\ \/\__/ /| | | | | || (_| || |   | |_
+ \____/\____/ |_| |_| |_| \__,_||_|    \__| CLI
+```
 
-[![Test](https://github.com/ragnarok22/gsmart/actions/workflows/test.yml/badge.svg)](https://github.com/ragnarok22/gsmart/actions)
-[![codecov](https://codecov.io/gh/ragnarok22/gsmart/branch/main/graph/badge.svg)](https://codecov.io/gh/ragnarok22/gsmart)
-[![NPM Downloads](https://img.shields.io/npm/dm/gsmart)](https://www.npmjs.com/package/gsmart)
-[![NPM Version](https://img.shields.io/npm/v/gsmart)](https://www.npmjs.com/package/gsmart)
-[![NPM License](https://img.shields.io/npm/l/gsmart)](https://github.com/ragnarok22/gsmart/blob/main/LICENSE)
+**AI-powered Git commit message generator** that helps you create meaningful, conventional commit messages using various AI providers.
 
-![GSmart Demo](https://repository-images.githubusercontent.com/827045490/756cb1d5-9572-4cc2-be37-0459da007c1a)
+## 🌟 Features
 
-## ✨ Features
+- ✨ **AI-Powered Commit Messages**: Generate conventional commit messages using state-of-the-art AI models
+- 🔄 **Multiple AI Providers**: Support for OpenAI, Anthropic, Google AI, Mistral, Fireworks AI, and PlataformIA
+- 📝 **Conventional Commits**: Follows the [Conventional Commits](https://www.conventionalcommits.org/) specification
+- 🎯 **Interactive File Selection**: Choose which files to stage before generating the commit message
+- 📋 **Clipboard Support**: Copy generated messages to clipboard
+- ⚡ **Automation Mode**: Auto-commit with `--yes` flag for CI/CD pipelines
+- 🎨 **Beautiful CLI**: Rich terminal output with colors and spinners
+- 🔐 **Secure Configuration**: API keys stored securely in system keyring (macOS Keychain, Windows Credential Manager, Linux Secret Service)
+- 🔄 **Automatic Retries**: Up to 3 retry attempts with exponential backoff for API failures
+- ✅ **Input Validation**: Validates changes before sending to API (saves costs and prevents errors)
+- 📝 **Comprehensive Logging**: Debug mode with detailed logging for troubleshooting
 
-- 🎯 **Smart Commit Messages**: AI-generated conventional commits based on your changes
-- 🔄 **Multiple AI Providers**: Support for OpenAI, Anthropic, Google, Mistral, Fireworks AI, and PlataformIA
-- 📋 **Interactive CLI**: Easy-to-use command line interface with interactive prompts
-- 🧠 **Rename-Aware Staging**: Detects renames and copies so both sides get staged automatically
-- 🔒 **Secure**: API keys stored locally and securely
-- ⚡ **Fast**: Quick analysis and generation of commit messages
-- 📖 **Conventional Commits**: Follows industry-standard commit message format
+## 📦 Installation
+
+### Using pip
+
+```bash
+pip install gsmart
+```
+
+### From Source
+
+```bash
+git clone https://github.com/Ross-cripto/gsmart-python.git
+cd gsmart
+pip install -e .
+```
+
+### Requirements
+
+- Python 3.10 or higher
+- Git installed and configured
+- API key from at least one supported provider
 
 ## 🚀 Quick Start
 
-### Installation
-
-Install GSmart globally using npm or pnpm:
-
-```bash
-# Using npm
-npm install -g gsmart
-
-# Using pnpm
-pnpm add -g gsmart
-
-# Using yarn
-yarn global add gsmart
-```
-
-### Setup
-
-1. **Configure your AI provider** (one-time setup):
+### 1. Login to Your AI Provider
 
 ```bash
 gsmart login
 ```
 
-You'll be prompted to select a provider and enter your API key:
+Select your preferred AI provider and enter your API key. The key will be stored securely in your system's keyring.
 
-```
-? Select a provider › Use arrow keys to navigate
-❯ OpenAI
-  Anthropic
-  Google Gemini
-  Mistral
-  Fireworks AI
-  PlataformIA
-```
-
-2. **Generate commit messages**:
+### 2. Generate a Commit Message
 
 ```bash
-# Stage your changes
-git add .
+# Make some changes in your git repository
+echo "print('Hello World')" > hello.py
 
-# Generate and apply commit message
+# Run gsmart to generate and commit
 gsmart
 ```
 
-That's it! GSmart will analyze your staged changes and generate a conventional commit message.
+The CLI will:
+1. Show you the modified files
+2. Let you select which files to stage
+3. Validate the changes (token limit)
+4. Generate a commit message using AI (with automatic retries if needed)
+5. Ask if you want to commit, copy to clipboard, regenerate, or do nothing
 
-## 💡 Usage Examples
-
-### Basic Usage
-
-```bash
-# Stage some files
-git add src/components/Button.tsx
-
-# Generate commit message
-gsmart
-# Output: "feat(components): add Button component with primary and secondary variants"
-```
-
-### Advanced Options
+### 3. Advanced Usage
 
 ```bash
 # Use a specific provider
-gsmart --provider anthropic
+gsmart generate --provider openai
 
-# Use a custom prompt
-gsmart --prompt "Focus on the security implications of these changes"
+# Add custom instructions
+gsmart generate --prompt "use emojis in the commit message"
 
-# Run non-interactively (auto-stage + commit if possible)
+# Enable debug mode for detailed logging
+gsmart --debug
+
+# Set custom token limit
+gsmart generate --max-tokens 9000
+
+# Auto-commit without prompts (useful for automation)
 gsmart --yes
 
-# Show help
-gsmart --help
+# Combine options
+gsmart generate --debug --provider openai --prompt "keep it concise" --max-tokens 6000 --yes
 ```
 
-When `--yes` is set, GSmart stages all detected changes—including renames—and skips interactive prompts so you can automate message generation.
+## 🎮 Commands
 
-## 📋 Command Reference
+### `gsmart generate`
+
+Generate a commit message based on staged changes.
+
+**Options:**
+- `-p, --prompt TEXT`: Additional instructions for the AI
+- `-P, --provider TEXT`: Specify AI provider (openai, anthropic, google, mistral, fireworks, plataformia)
+- `-y, --yes`: Auto-commit without prompting
+- `-t, --max-tokens INTEGER`: Maximum tokens for input validation (default: 8000)
+- `--debug`: Enable debug logging
+- `--help`: Show help message
+
+**Examples:**
 
 ```bash
-Usage: gsmart [options] [command]
+# Basic usage
+gsmart
 
-CLI to generate smart commit messages using AI. generate command is the default command.
+# With custom prompt
+gsmart generate -p "use present tense"
 
-Options:
-  -V, --version                    Output the version number
-  -h, --help                       Display help for command
+# Specify provider
+gsmart -P anthropic
 
-Commands:
-  generate [options]               Generate a commit message based on staged changes (default)
-    --provider <provider>          Use a specific AI provider
-    --prompt <prompt>              Custom prompt for the AI model
-    --yes                         Run non-interactively (auto stage + commit)
+# Debug mode
+gsmart --debug
 
-  login                           Configure AI provider and API key
-  reset                           Reset all API keys and configuration
-  help [command]                  Display help for command
+# Custom token limit
+gsmart --max-tokens 5000
+
+# Automation mode
+gsmart generate -y
+
+# All options combined
+gsmart generate --debug -P openai -p "be concise" -t 6000 -y
 ```
 
-## 🤖 Supported AI Providers
+### `gsmart login`
 
-| Provider         | Model                                                                             | Get API Key                                                  |
-| ---------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| **OpenAI**       | [GPT-4o](https://platform.openai.com/docs/models/gpt-4o)                          | [Get Key](https://platform.openai.com/api-keys)              |
-| **Anthropic**    | [Claude](https://www.anthropic.com/claude)                                        | [Get Key](https://console.anthropic.com/settings/keys)       |
-| **Google**       | [Gemini 2.0 Flash](https://ai.google.dev/gemini-api/docs/models#gemini-2.0-flash) | [Get Key](https://console.cloud.google.com/apis/credentials) |
-| **Mistral**      | [Mistral Large](https://mistral.ai/technology/#models)                            | [Get Key](https://console.mistral.ai/api-keys/)              |
-| **Fireworks AI** | [FireFunction V1](https://fireworks.ai/models/fireworks/firefunction-v1)          | [Get Key](https://fireworks.ai/api-keys)                     |
-| **PlataformIA**  | [Radiance](https://docs.plataformia.com/llm-chat-api)                             | [Get Key](https://console.plataformia.com/api-keys)          |
-
-## 🛠️ Development
-
-### Requirements
-
-- Node.js 18+ with ESM support
-- pnpm (recommended) or npm
-
-### Scripts
+Add or update API keys for AI providers.
 
 ```bash
-# Install dependencies
-pnpm install
+gsmart login
+```
 
-# Development mode
-pnpm run dev
+This will:
+1. Show a list of available providers
+2. Prompt for your API key
+3. Store it securely in your system's keyring (not in plaintext)
 
-# Build the project
-pnpm run build
+### `gsmart reset`
 
-# Run tests
-pnpm test
+Clear all stored configuration and API keys.
+
+**Options:**
+- `-f, --force`: Skip confirmation prompt
+
+**Examples:**
+
+```bash
+# With confirmation
+gsmart reset
+
+# Force reset
+gsmart reset --force
+```
+
+## 🔑 Supported AI Providers
+
+### OpenAI
+- **Models**: GPT-4o-mini
+- **Get API Key**: https://platform.openai.com/api-keys
+
+### Anthropic (Claude)
+- **Models**: Claude 3.5 Haiku
+- **Get API Key**: https://console.anthropic.com/
+
+### Google AI (Gemini)
+- **Models**: Gemini 2.0 Flash
+- **Get API Key**: https://makersuite.google.com/app/apikey
+
+### Mistral
+- **Models**: Mistral Large
+- **Get API Key**: https://console.mistral.ai/
+
+### Fireworks AI
+- **Models**: Llama 3.1 70B
+- **Get API Key**: https://fireworks.ai/
+
+### PlataformIA
+- **Models**: Radiance
+- **Get API Key**: https://plataformia.com/
+
+## 🔧 Configuration
+
+### Secure API Key Storage
+
+API keys are now stored securely using your system's keyring:
+- **macOS**: Keychain Access
+- **Windows**: Credential Manager
+- **Linux**: Secret Service (GNOME Keyring, KDE Wallet)
+
+No more plaintext API keys in config files!
+
+### Token Limits
+
+By default, GSmart validates that your changes don't exceed 8000 tokens before sending to the API. You can customize this:
+
+```bash
+# For large commits
+gsmart generate --max-tokens 12000
+
+# For small, frequent commits
+gsmart generate --max-tokens 4000
+```
+
+### Debug Mode
+
+When troubleshooting, enable debug mode for detailed logging:
+
+```bash
+gsmart --debug
+```
+
+This shows:
+- Detailed operation logs
+- API call information
+- Validation steps
+- Error stack traces
+
+## 🎯 Commit Message Format
+
+GSmart generates commit messages following the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+```
+<type>(<scope>): <description>
+```
+
+### Commit Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Adding or updating tests
+- `build`: Build system changes
+- `ci`: CI/CD changes
+- `chore`: Other changes (maintenance, etc.)
+- `revert`: Revert previous commit
+
+### Examples
+
+```
+feat(auth): add OAuth2 login functionality
+fix(api): resolve undefined response in user endpoint
+docs(readme): update installation instructions
+style(components): format code according to style guide
+refactor(utils): simplify error handling logic
+perf(database): optimize query performance
+test(auth): add unit tests for login flow
+build(deps): upgrade Django to 4.2
+ci(github): add automated testing workflow
+chore(release): bump version to 2.0.0
+revert: remove experimental feature flag
+```
+
+## 🧪 Development
+
+### Setup Development Environment
+
+```bash
+# Clone repository
+git clone https://github.com/Ross-cripto/gsmart-python.git
+cd gsmart
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install in development mode
+pip install -e ".[dev]"
+```
+
+### Development Dependencies
+
+```bash
+pip install pytest pytest-cov black ruff mypy
+```
+
+### Run Tests
+
+```bash
+pytest
+pytest --cov=gsmart
+```
+
+### Code Formatting
+
+```bash
+# Format code
+black .
 
 # Lint code
-pnpm run lint
+ruff check .
 
-# Format code
-pnpm run format
-```
-
-### Project Structure
-
-```
-src/
-├── commands/          # CLI command implementations
-├── utils/
-│   ├── ai.ts         # AI provider integrations
-│   ├── git.ts        # Git operations
-│   └── config.ts     # Configuration management
-├── gsmart.ts         # Command registration
-└── index.ts          # CLI entry point
+# Type checking
+mypy gsmart_cli.py commands/ utils/
 ```
 
 ## 🤝 Contributing
 
+Contributions are welcome! Please follow these steps:
+
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes using GSmart! (`gsmart`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes using gsmart! (`gsmart`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📄 Changelog
+### Contribution Guidelines
 
-See [CHANGELOG.md](CHANGELOG.md) for details about releases and changes.
+- Follow PEP 8 style guide
+- Add type hints to all functions
+- Write docstrings for all public functions
+- Add tests for new features
+- Update README if needed
 
 ## 📝 License
 
-This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Authors
+
+- **Reinier Hernández** - Original Node.js version
+- **Miguel** - Python implementation
+
+## 🙏 Acknowledgments
+
+- Inspired by the original [gsmart](https://github.com/ragnarok22/gsmart) Node.js CLI
+- AI SDK providers: OpenAI, Anthropic, Google, Mistral, Fireworks, PlataformIA
+- [Conventional Commits](https://www.conventionalcommits.org/) specification
+- Python community for excellent libraries: Click, Rich, Questionary, Tenacity, Keyring
+
+## 📊 Changelog
+
+### Version .1.1 
+- 🔐 **Secure API Keys**: Now using system keyring instead of plaintext config files
+- 🔄 **Automatic Retries**: Up to 3 retry attempts with exponential backoff for API failures
+- ✅ **Input Validation**: Validates token limits before API calls (saves costs)
+- 📝 **Logging System**: Comprehensive logging with `--debug` flag
+- ⚙️ **Configurable Limits**: New `--max-tokens` option to customize validation limits
+
+### Version 0.1.0 
+- Initial Python implementation
+- Support for 6 AI providers
+- Interactive file selection
+- Conventional Commits format
+- Clipboard support
+- Auto-commit mode
+- Configuration management
+- Update checker
+
+## 🐛 Known Issues
+
+- None currently reported
+
+## 💡 Future Enhancements
+
+- [ ] Add support for commit message templates
+- [ ] Multi-line commit messages with body and footer
+- [ ] Git hooks integration
+- [ ] Custom commit type definitions
+- [ ] Batch commit mode for multiple commits
+- [ ] Commit message history and favorites
+- [ ] Integration with GitHub/GitLab APIs
+- [ ] Response caching to avoid duplicate API calls
+
+## 📬 Support
+
+- **Issues**: https://github.com/Ross-cripto/gsmart-python/issues
+- **Discussions**: https://github.com/Ross-cripto/gsmart-python/discussions
+
+## ⭐ Star History
+
+If you find this project useful, please consider giving it a star on GitHub!
 
 ---
 
-<p align="center">
-  <sub>Built with ❤️ by <a href="https://github.com/ragnarok22">@ragnarok22</a></sub>
-</p>
+Made with ❤️ by developers, for developers.
